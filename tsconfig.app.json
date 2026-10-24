@@ -1,0 +1,34 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "useDefineForClassFields": true,
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "noImplicitOverride": true,
+    "paths": {
+      "@tic-tac-toe/game-util-game-logic": [
+        "./libs/game/util-game-logic/src/index.ts"
+      ],
+      "@tic-tac-toe/game-data-access": ["./libs/game/data-access/src/index.ts"],
+      "@tic-tac-toe/game-ui-board": ["./libs/game/ui-board/src/index.ts"],
+      "@tic-tac-toe/game-feature": ["./libs/game/feature-game/src/index.ts"],
+      "@tic-tac-toe/scoreboard-feature": [
+        "./libs/scoreboard/feature-scoreboard/src/index.ts"
+      ]
+    },
+    "types": ["vite/client"]
+  },
+  "include": ["src", "libs"]
+}

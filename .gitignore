@@ -1,0 +1,54 @@
+# Build & tooling output
+dist
+tmp
+out-tsc
+coverage
+test-output
+*.tsbuildinfo
+vite.config.*.timestamp*
+vitest.config.*.timestamp*
+.vitest
+
+# Dependencies
+node_modules
+
+# Environment
+.env
+.env.*
+
+# IDE
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Misc
+/.sass-cache
+/connect.lock
+/libpeerconnection.log
+npm-debug.log
+yarn-error.log
+testem.log
+/typings
+
+# OS & local editor
+.DS_Store
+**/.DS_Store
+Thumbs.db
+.cursor/
+
+# Legacy Nx / old nested workspace (not used after hoist)
+tic-tac-toe/
+apps/
+.nx/
+
+.claude/worktrees
+.claude/settings.local.json

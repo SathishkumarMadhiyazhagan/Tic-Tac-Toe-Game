@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2023"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "strict": true,
+    "types": ["node", "vitest/globals"]
+  },
+  "include": [
+    "vite.config.mts",
+    "server/**/*.mts",
+    "server/**/*.ts",
+    "libs/game/game-service/**/*.ts",
+    "libs/game/util-game-logic/**/*.ts",
+    "**/*.{test,spec}.{ts,mts,tsx}",
+    "libs/**/*.{test,spec}.{ts,mts,tsx}"
+  ]
+}

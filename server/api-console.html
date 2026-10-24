@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>JSON Server — Tic Tac Toe API</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.45;
+      margin: 0;
+      color: #24292e;
+      background: #f6f8fa;
+    }
+    .wrap { max-width: 56rem; margin: 0 auto; padding: 1.25rem 1rem 3rem; }
+    h1 { font-size: 1.6rem; margin: 0 0 0.25rem; }
+    h2 { font-size: 1.05rem; margin: 1.5rem 0 0.6rem; color: #24292e; }
+    .muted { color: #57606a; font-size: 0.9rem; }
+    .card {
+      background: #fff;
+      border: 1px solid #d0d7de;
+      border-radius: 8px;
+      padding: 1rem 1.1rem;
+      margin-bottom: 1rem;
+    }
+    .row { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem; }
+    label { font-size: 0.85rem; font-weight: 500; }
+    input, select {
+      font: inherit;
+      padding: 0.35rem 0.5rem;
+      border: 1px solid #d0d7de;
+      border-radius: 6px;
+    }
+    input[type="number"] { width: 4rem; }
+    #gameId { width: 5rem; }
+    button, .btn-link {
+      font: inherit;
+      cursor: pointer;
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      border: 1px solid #d0d7de;
+      background: #f6f8fa;
+    }
+    button:hover { background: #eef1f4; }
+    button.primary { background: #2da44e; color: #fff; border-color: #2da44e; }
+    button.primary:hover { background: #2c974b; }
+    button.danger { background: #cf222e; color: #fff; border-color: #cf222e; }
+    button.danger:hover { background: #a40e26; }
+    .method {
+      display: inline-block;
+      min-width: 4.2rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.15rem 0.35rem;
+      border-radius: 4px;
+      text-align: center;
+    }
+    .get { background: #ddf4ff; color: #0969da; }
+    .post { background: #dafbe1; color: #1a7f37; }
+    .patch { background: #fff8c5; color: #9a6700; }
+    #response {
+      margin: 0;
+      padding: 1rem;
+      background: #0d1117;
+      color: #e6edf3;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      line-height: 1.4;
+      overflow: auto;
+      max-height: 22rem;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .status { font-size: 0.85rem; margin-bottom: 0.35rem; }
+    .status.ok { color: #1a7f37; }
+    .status.err { color: #cf222e; }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 3.25rem);
+      gap: 4px;
+      margin-top: 0.75rem;
+    }
+    .cell {
+      width: 3.25rem;
+      height: 3.25rem;
+      font-size: 1.35rem;
+      font-weight: 600;
+      border: 2px solid #d0d7de;
+      border-radius: 6px;
+      background: #fff;
+      cursor: pointer;
+    }
+    .cell:disabled { cursor: not-allowed; opacity: 0.85; }
+    .cell.win { background: #fff8c5; border-color: #9a6700; }
+    .game-list { list-style: none; padding: 0; margin: 0.5rem 0 0; max-height: 8rem; overflow: auto; }
+    .game-list li {
+      padding: 0.35rem 0.5rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-family: ui-monospace, monospace;
+    }
+    .game-list li:hover { background: #f6f8fa; }
+    .game-list li.active { background: #ddf4ff; }
+    a.resource { color: #0969da; font-size: 0.9rem; }
+    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 640px) { .split { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <p style="font-size:1.4rem;margin:0">✧(≖ ヮ ≖)✧</p>
+    <h1>JSON Server</h1>
+    <p class="muted">Interactive Tic Tac Toe API console. Data from Express <code>game-service</code> (in-memory).</p>
+
+    <div class="card">
+      <div class="row">
+        <label for="gameId">Active game id</label>
+        <input id="gameId" type="text" placeholder="1" />
+        <button type="button" id="btnLoadGame" class="primary">Load game</button>
+      </div>
+      <p class="muted" style="margin:0">Create a game below or pick one from the list. Click the board to play (human move).</p>
+    </div>
+
+    <div class="split">
+      <div>
+        <h2>Resources</h2>
+        <div class="card">
+          <div class="row">
+            <span class="method get">GET</span>
+            <a class="resource" href="/api/games" target="_blank" rel="noopener">/api/games</a>
+            <button type="button" id="btnListGames">Fetch</button>
+          </div>
+          <ul class="game-list" id="gameList"></ul>
+          <div class="row" style="margin-top:0.75rem">
+            <span class="method get">GET</span>
+            <a class="resource" href="/api/scoreboard" target="_blank" rel="noopener">/api/scoreboard</a>
+            <button type="button" id="btnScoreboard">Fetch</button>
+          </div>
+        </div>
+
+        <h2>Games</h2>
+        <div class="card">
+          <div class="row">
+            <span class="method post">POST</span>
+            <code>/api/games</code>
+            <select id="createMode">
+              <option value="TwoPlayer">TwoPlayer</option>
+              <option value="Computer">Computer</option>
+            </select>
+            <button type="button" id="btnCreate" class="primary">Create</button>
+          </div>
+          <div class="row">
+            <span class="method get">GET</span>
+            <code>/api/games/:id</code>
+            <button type="button" id="btnGetGame">Get by id</button>
+          </div>
+          <div class="row">
+            <span class="method post">POST</span>
+            <code>/api/games/:id/moves</code>
+            <label>row</label><input id="moveRow" type="number" min="1" max="3" value="1" />
+            <label>col</label><input id="moveCol" type="number" min="1" max="3" value="1" />
+            <button type="button" id="btnMove">Send move</button>
+          </div>
+          <div class="row">
+            <span class="method post">POST</span>
+            <code>/api/games/:id/undo</code>
+            <button type="button" id="btnUndo">Undo</button>
+          </div>
+          <div class="row">
+            <span class="method post">POST</span>
+            <code>/api/games/:id/reset</code>
+            <button type="button" id="btnReset">Reset board</button>
+          </div>
+          <div class="row">
+            <span class="method patch">PATCH</span>
+            <code>/api/games/:id/mode</code>
+            <select id="patchMode">
+              <option value="TwoPlayer">TwoPlayer</option>
+              <option value="Computer">Computer</option>
+            </select>
+            <button type="button" id="btnPatchMode">Apply mode</button>
+          </div>
+        </div>
+
+        <h2>Scoreboard</h2>
+        <div class="card">
+          <div class="row">
+            <span class="method post">POST</span>
+            <code>/api/scoreboard/reset</code>
+            <button type="button" id="btnResetScore" class="danger">Reset scores</button>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h2>Board preview</h2>
+        <div class="card">
+          <div id="meta" class="muted">Load or create a game to interact with the board.</div>
+          <div class="board" id="board" aria-label="Tic tac toe board"></div>
+        </div>
+
+        <h2>Response</h2>
+        <div class="card">
+          <div id="statusLine" class="status muted">No request yet.</div>
+          <pre id="response">{}</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    let lastState = null;
+
+    function gameId() {
+      return $('gameId').value.trim();
+    }
+
+    function setGameId(id) {
+      $('gameId').value = id;
+      localStorage.setItem('ticTacToeApiGameId', id);
+    }
+
+    async function api(method, path, body) {
+      const opts = { method, headers: {} };
+      if (body !== undefined) {
+        opts.headers['Content-Type'] = 'application/json';
+        opts.body = JSON.stringify(body);
+      }
+      const res = await fetch(path, opts);
+      let data;
+      const text = await res.text();
+      try {
+        data = text ? JSON.parse(text) : null;
+      } catch {
+        data = text;
+      }
+      $('statusLine').textContent = res.status + ' ' + res.statusText + ' — ' + method + ' ' + path;
+      $('statusLine').className = 'status ' + (res.ok ? 'ok' : 'err');
+      $('response').textContent = JSON.stringify(data, null, 2);
+      if (data && !Array.isArray(data) && data.gameId) {
+        lastState = data;
+        setGameId(data.gameId);
+        renderBoard(data);
+        renderMeta(data);
+      }
+      return { res, data };
+    }
+
+    function renderMeta(state) {
+      if (!state) return;
+      $('meta').textContent =
+        'Game ' + state.gameId + ' · ' + state.mode + ' · ' + state.status +
+        ' · Turn: ' + state.currentPlayer +
+        (state.winner ? ' · Winner: ' + state.winner : '') +
+        ' · Score X:' + state.scoreboard.xWins + ' O:' + state.scoreboard.oWins + ' D:' + state.scoreboard.draws;
+    }
+
+    function winningSet(state) {
+      const set = new Set();
+      if (!state.winningCells || !state.winningCells.length) return set;
+      const first = state.winningCells[0];
+      if (typeof first === 'number') {
+        state.winningCells.forEach((i) => set.add(i));
+      } else {
+        state.winningCells.forEach((p) => set.add((p.row - 1) * 3 + (p.column - 1)));
+      }
+      return set;
+    }
+
+    function renderBoard(state) {
+      const board = $('board');
+      board.innerHTML = '';
+      const wins = winningSet(state);
+      const finished = state.status !== 'InProgress';
+      for (let i = 0; i < 9; i++) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'cell' + (wins.has(i) ? ' win' : '');
+        const cell = state.board[i];
+        btn.textContent = cell === '' || cell === null ? '' : cell;
+        const row = Math.floor(i / 3) + 1;
+        const col = (i % 3) + 1;
+        btn.title = 'Row ' + row + ', Column ' + col;
+        const canPlay = !finished && !btn.textContent;
+        btn.disabled = !canPlay;
+        if (canPlay) {
+          btn.addEventListener('click', () => playCell(row, col));
+        }
+        board.appendChild(btn);
+      }
+    }
+
+    async function playCell(row, col) {
+      const id = gameId();
+      if (!id) {
+        alert('Set a game id or create a game first.');
+        return;
+      }
+      $('moveRow').value = row;
+      $('moveCol').value = col;
+      await api('POST', '/api/games/' + encodeURIComponent(id) + '/moves', { row, column: col });
+    }
+
+    function renderGameList(games) {
+      const ul = $('gameList');
+      ul.innerHTML = '';
+      if (!Array.isArray(games) || !games.length) {
+        ul.innerHTML = '<li class="muted">No games</li>';
+        return;
+      }
+      const active = gameId();
+      games.forEach((g) => {
+        const li = document.createElement('li');
+        li.textContent = '#' + g.gameId + ' · ' + g.mode + ' · ' + g.status + ' · moves:' + g.moveHistory.length;
+        if (g.gameId === active) li.className = 'active';
+        li.addEventListener('click', async () => {
+          setGameId(g.gameId);
+          const { data } = await api('GET', '/api/games/' + encodeURIComponent(g.gameId));
+          if (data) renderGameList(games);
+        });
+        ul.appendChild(li);
+      });
+    }
+
+    $('btnCreate').addEventListener('click', async () => {
+      await api('POST', '/api/games', { mode: $('createMode').value });
+      $('btnListGames').click();
+    });
+    $('btnListGames').addEventListener('click', async () => {
+      const { data } = await api('GET', '/api/games');
+      renderGameList(data);
+    });
+    $('btnGetGame').addEventListener('click', async () => {
+      const id = gameId();
+      if (!id) return alert('Enter game id');
+      await api('GET', '/api/games/' + encodeURIComponent(id));
+    });
+    $('btnLoadGame').addEventListener('click', () => $('btnGetGame').click());
+    $('btnMove').addEventListener('click', async () => {
+      const id = gameId();
+      if (!id) return alert('Enter game id');
+      await api('POST', '/api/games/' + encodeURIComponent(id) + '/moves', {
+        row: Number($('moveRow').value),
+        column: Number($('moveCol').value),
+      });
+    });
+    $('btnUndo').addEventListener('click', async () => {
+      const id = gameId();
+      if (!id) return alert('Enter game id');
+      await api('POST', '/api/games/' + encodeURIComponent(id) + '/undo');
+    });
+    $('btnReset').addEventListener('click', async () => {
+      const id = gameId();
+      if (!id) return alert('Enter game id');
+      await api('POST', '/api/games/' + encodeURIComponent(id) + '/reset', {});
+    });
+    $('btnPatchMode').addEventListener('click', async () => {
+      const id = gameId();
+      if (!id) return alert('Enter game id');
+      await api('PATCH', '/api/games/' + encodeURIComponent(id) + '/mode', { mode: $('patchMode').value });
+    });
+    $('btnScoreboard').addEventListener('click', () => api('GET', '/api/scoreboard'));
+    $('btnResetScore').addEventListener('click', () => api('POST', '/api/scoreboard/reset'));
+
+    const saved = localStorage.getItem('ticTacToeApiGameId');
+    if (saved) $('gameId').value = saved;
+    $('btnListGames').click();
+    if (saved) $('btnGetGame').click();
+  </script>
+</body>
+</html>

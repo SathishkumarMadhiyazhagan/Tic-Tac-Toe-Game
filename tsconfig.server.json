@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.node.json",
+  "compilerOptions": {
+    "paths": {
+      "@tic-tac-toe/game-util-game-logic": [
+        "./libs/game/util-game-logic/src/index.ts"
+      ]
+    }
+  },
+  "include": [
+    "server/**/*.mts",
+    "server/**/*.ts",
+    "libs/game/game-service/**/*.ts",
+    "libs/game/util-game-logic/**/*.ts"
+  ]
+}

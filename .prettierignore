@@ -1,0 +1,17 @@
+# Build & cache
+dist
+coverage
+out-tsc
+test-output
+*.tsbuildinfo
+.vitest
+.nx
+
+# Dependencies (Prettier skips by default; explicit for clarity)
+node_modules
+
+# Generated / hand-maintained HTML console
+server/api-console.html
+
+# Lockfile (avoid noisy diffs on install)
+package-lock.json
